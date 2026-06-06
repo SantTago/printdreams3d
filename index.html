@@ -301,29 +301,14 @@
     .products { padding: 120px 0; position: relative; z-index: 2; }
     .sec-head { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 56px; gap: 24px; flex-wrap: wrap; }
 
-    /* Featured */
-    .p-featured {
-      background: var(--glass); border: 1px solid var(--glass-b); border-radius: 24px;
-      display: grid; grid-template-columns: 1fr 1fr; overflow: hidden; margin-bottom: 20px;
-      backdrop-filter: blur(20px); transition: border-color .5s, box-shadow .5s;
-      will-change: transform;
-    }
-    .p-featured:hover { border-color: rgba(14,165,233,.25); box-shadow: 0 0 60px rgba(14,165,233,.06); }
-
-    .p-feat-img {
-      background: rgba(14,165,233,.03); display: flex; align-items: center; justify-content: center;
-      padding: 40px; min-height: 400px; position: relative; overflow: hidden;
-    }
-    .p-feat-img::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at center,rgba(14,165,233,.08) 0%,transparent 70%); }
-    .p-feat-img img { width: 100%; max-height: 340px; object-fit: contain; position: relative; z-index: 1; filter: drop-shadow(0 0 40px rgba(14,165,233,.2)); transition: transform .7s var(--ease), filter .7s; }
-    .p-featured:hover .p-feat-img img { transform: scale(1.05); filter: drop-shadow(0 0 64px rgba(14,165,233,.4)); }
-
-    .p-feat-body { padding: 52px 48px; display: flex; flex-direction: column; justify-content: center; }
-    .p-feat-body .d1   { font-size: clamp(2rem,3.5vw,3.2rem); margin-bottom: 16px; }
-    .p-feat-body .lead { margin-bottom: 32px; }
-
     /* Product grid */
-    .p-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+    .p-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 20px; }
+
+    /* Em breve card */
+    .p-card.soon { opacity: .38; pointer-events: none; }
+    .p-card.soon .p-img { min-height: 180px; }
+    .soon-icon { color: rgba(14,165,233,.4); margin-bottom: 10px; }
+    .soon-label { font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: rgba(14,165,233,.5); }
 
     .p-card {
       background: var(--glass); border: 1px solid var(--glass-b); border-radius: 20px;
@@ -398,9 +383,6 @@
       .stats-grid   { grid-template-columns: repeat(2,1fr); }
       .about-grid   { grid-template-columns: 1fr; gap: 52px; }
       .about-img-wrap { max-width: 460px; }
-      .p-featured   { grid-template-columns: 1fr; }
-      .p-feat-img   { min-height: 300px; }
-      .p-feat-body  { padding: 40px; }
       .p-grid       { grid-template-columns: repeat(2,1fr); }
       .cta-card     { padding: 64px 40px; }
       .cta-info-row { gap: 28px; }
@@ -416,7 +398,6 @@
       .burger { display: flex; cursor: auto; }
       .scroll-hint { display: none; }
       .pillars-grid, .stats-grid, .p-grid { grid-template-columns: 1fr; }
-      .p-featured { grid-template-columns: 1fr; }
       .cta-card { padding: 48px 24px; }
       .cta-info-row { flex-direction: column; gap: 20px; align-items: flex-start; padding: 0 20px; }
       .foot-grid { grid-template-columns: 1fr; gap: 32px; }
@@ -622,42 +603,133 @@
     <div class="sec-head sa">
       <div>
         <div class="neon-bar"></div>
-        <span class="label">Catálogo</span>
-        <h2 class="d1">NOSSOS<br><em>PRODUTOS</em></h2>
+        <span class="label">Linhas de Produtos</span>
+        <h2 class="d1">NOSSAS<br><em>4 LINHAS</em></h2>
       </div>
       <a href="https://api.whatsapp.com/send?phone=5519989485354&text=Olá!%20Gostaria%20de%20solicitar%20um%20orçamento." target="_blank" rel="noopener" class="btn btn-neon">Solicitar Orçamento</a>
     </div>
 
-    <div class="p-featured sa-scale">
-      <div class="p-feat-img">
-        <img src="https://static.wixstatic.com/media/b9c99c_32a93d30e6fe405aac75be3dcac2bd3e~mv2.png" alt="Capa de Membro Inferior" loading="lazy">
-      </div>
-      <div class="p-feat-body">
-        <span class="label">Produto em Destaque</span>
-        <h3 class="d1" style="font-size:clamp(2rem,3.5vw,3.2rem);margin-bottom:16px">CAPA DE<br><em>MEMBRO INFERIOR</em></h3>
-        <p class="lead" style="margin-bottom:32px">Capas 3D personalizadas para próteses de membro inferior — estéticas, leves e duráveis. Tecnologia de ponta combinada com design individual para cada paciente.</p>
-        <a href="printdreams3d/capa-de-membro-inferior.html" class="btn btn-neon" style="align-self:flex-start">
-          Ver Detalhes
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </a>
-      </div>
-    </div>
-
     <div class="p-grid" data-stagger>
+      <!-- 1 -->
+      <div class="p-card">
+        <div class="p-img"><img src="https://static.wixstatic.com/media/b9c99c_32a93d30e6fe405aac75be3dcac2bd3e~mv2.png" alt="Capa de Membro Inferior" loading="lazy"></div>
+        <div class="p-body">
+          <h3 class="p-name">Capa de Membro Inferior</h3>
+          <p class="p-desc">Capas 3D personalizadas para próteses de membro inferior — estéticas, leves e duráveis.</p>
+          <a href="capa-de-membro-inferior.html" class="p-link">Ver Produto <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+        </div>
+      </div>
+      <!-- 2 -->
       <div class="p-card">
         <div class="p-img"><img src="https://static.wixstatic.com/media/b9c99c_ddfb06df084640bf9fc8cfa80d113adc~mv2.png" alt="Prótese de Membro Superior" loading="lazy"></div>
         <div class="p-body">
           <h3 class="p-name">Prótese de Membro Superior</h3>
           <p class="p-desc">Próteses de mão e braço leves, duráveis e totalmente personalizáveis em estilo, cor e design.</p>
-          <a href="printdreams3d/protese-mecanica.html" class="p-link">Ver Produto <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+          <a href="protese-mecanica.html" class="p-link">Ver Produto <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
         </div>
       </div>
+      <!-- 3 -->
       <div class="p-card">
         <div class="p-img"><img src="https://static.wixstatic.com/media/b9c99c_6f16be5357b648389eb1cf00d31bc4c7~mv2.png" alt="Componentes Prótese" loading="lazy"></div>
         <div class="p-body">
           <h3 class="p-name">Componentes Prótese</h3>
           <p class="p-desc">Peças e componentes impressos em 3D para reposição e montagem com alta qualidade e precisão dimensional.</p>
-          <a href="printdreams3d/componentes-protese.html" class="p-link">Ver Produto <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+          <a href="componentes-protese.html" class="p-link">Ver Produto <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+        </div>
+      </div>
+      <!-- 4 -->
+      <div class="p-card">
+        <div class="p-img"><img src="https://static.wixstatic.com/media/b9c99c_b91a38d9b3c24707bc8eac979f01c3d0~mv2.png" alt="EPIs" loading="lazy"></div>
+        <div class="p-body">
+          <h3 class="p-name">EPIs</h3>
+          <p class="p-desc">Equipamentos de proteção individual desenvolvidos com manufatura aditiva para uso profissional e hospitalar.</p>
+          <a href="epis.html" class="p-link">Ver Produto <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+        </div>
+      </div>
+      <!-- 5 -->
+      <div class="p-card">
+        <div class="p-img"><img src="https://static.wixstatic.com/media/b9c99c_5db3fc5edf56459e98007df9b6d5fa4c~mv2.png" alt="Palmilha Personalizada" loading="lazy"></div>
+        <div class="p-body">
+          <h3 class="p-name">Palmilha Personalizada</h3>
+          <p class="p-desc">Palmilhas ortopédicas produzidas sob medida com escaneamento 3D para máximo conforto e correção postural.</p>
+          <a href="palmilha-personalizada.html" class="p-link">Ver Produto <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+        </div>
+      </div>
+      <!-- 6 Em breve -->
+      <div class="p-card soon">
+        <div class="p-img" style="flex-direction:column;gap:8px">
+          <svg class="soon-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          <span class="soon-label">Em breve</span>
+        </div>
+        <div class="p-body">
+          <h3 class="p-name">Novo Produto</h3>
+          <p class="p-desc">Em desenvolvimento. Novidades em breve.</p>
+        </div>
+      </div>
+      <!-- 7 Em breve -->
+      <div class="p-card soon">
+        <div class="p-img" style="flex-direction:column;gap:8px">
+          <svg class="soon-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          <span class="soon-label">Em breve</span>
+        </div>
+        <div class="p-body">
+          <h3 class="p-name">Novo Produto</h3>
+          <p class="p-desc">Em desenvolvimento. Novidades em breve.</p>
+        </div>
+      </div>
+      <!-- 8 Em breve -->
+      <div class="p-card soon">
+        <div class="p-img" style="flex-direction:column;gap:8px">
+          <svg class="soon-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          <span class="soon-label">Em breve</span>
+        </div>
+        <div class="p-body">
+          <h3 class="p-name">Novo Produto</h3>
+          <p class="p-desc">Em desenvolvimento. Novidades em breve.</p>
+        </div>
+      </div>
+      <!-- 9 Em breve -->
+      <div class="p-card soon">
+        <div class="p-img" style="flex-direction:column;gap:8px">
+          <svg class="soon-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          <span class="soon-label">Em breve</span>
+        </div>
+        <div class="p-body">
+          <h3 class="p-name">Novo Produto</h3>
+          <p class="p-desc">Em desenvolvimento. Novidades em breve.</p>
+        </div>
+      </div>
+      <!-- 10 Em breve -->
+      <div class="p-card soon">
+        <div class="p-img" style="flex-direction:column;gap:8px">
+          <svg class="soon-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          <span class="soon-label">Em breve</span>
+        </div>
+        <div class="p-body">
+          <h3 class="p-name">Novo Produto</h3>
+          <p class="p-desc">Em desenvolvimento. Novidades em breve.</p>
+        </div>
+      </div>
+      <!-- 11 Em breve -->
+      <div class="p-card soon">
+        <div class="p-img" style="flex-direction:column;gap:8px">
+          <svg class="soon-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          <span class="soon-label">Em breve</span>
+        </div>
+        <div class="p-body">
+          <h3 class="p-name">Novo Produto</h3>
+          <p class="p-desc">Em desenvolvimento. Novidades em breve.</p>
+        </div>
+      </div>
+      <!-- 12 Em breve -->
+      <div class="p-card soon">
+        <div class="p-img" style="flex-direction:column;gap:8px">
+          <svg class="soon-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          <span class="soon-label">Em breve</span>
+        </div>
+        <div class="p-body">
+          <h3 class="p-name">Novo Produto</h3>
+          <p class="p-desc">Em desenvolvimento. Novidades em breve.</p>
         </div>
       </div>
     </div>
