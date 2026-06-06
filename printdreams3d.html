@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="PrintDreams 3D — Próteses e órteses personalizadas com manufatura aditiva 3D. Campinas, SP.">
+  <title>Print Dreams 3D — Próteses Sob Medida</title>
+  <link rel="icon" href="https://static.wixstatic.com/media/b9c99c_49c07e9bb99b4797bd3fc2a27c660d6f~mv2.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital@1&display=swap" rel="stylesheet">
+
+  <style>
+    /* ─── Reset ────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:       #03030A;
+      --neon:     #0EA5E9;
+      --neon2:    #67E8F9;
+      --neon-d:   rgba(14,165,233,.15);
+      --neon-g:   rgba(14,165,233,.35);
+      --glass:    rgba(255,255,255,.04);
+      --glass-b:  rgba(255,255,255,.08);
+      --white:    #FFFFFF;
+      --muted:    rgba(255,255,255,.55);
+      --dim:      rgba(255,255,255,.2);
+      --font:     'Inter', -apple-system, sans-serif;
+      --bebas:    'Bebas Neue', Impact, sans-serif;
+      --serif:    'Playfair Display', Georgia, serif;
+      --max:      1200px;
+      --ease:     cubic-bezier(.16,1,.3,1);
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--white);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      cursor: none;
+    }
+    img { max-width: 100%; display: block; }
+    a   { color: inherit; text-decoration: none; }
+    ul  { list-style: none; }
+    .container { position: relative; z-index: 2; width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 10px; }
+
+    /* ─── Custom cursor ───────────────────────── */
+    #cursor-dot, #cursor-ring {
+      position: fixed; border-radius: 50%;
+      pointer-events: none; z-index: 9999; transform: translate(-50%,-50%);
+    }
+    #cursor-dot  { width: 6px; height: 6px; background: var(--neon); box-shadow: 0 0 12px var(--neon); transition: transform .1s; }
+    #cursor-ring { width: 36px; height: 36px; border: 1.5px solid rgba(14,165,233,.5); transition: transform .12s, width .3s var(--ease), height .3s var(--ease), border-color .3s; }
+    body.hovering #cursor-dot  { transform: translate(-50%,-50%) scale(2.5); }
+    body.hovering #cursor-ring { width: 56px; height: 56px; border-color: var(--neon); }
+
+    /* ─── Scroll progress bar ─────────────────── */
+    #prog {
+      position: fixed; top: 0; left: 0; height: 2px; width: 0%;
+      background: linear-gradient(90deg, var(--neon), var(--neon2));
+      box-shadow: 0 0 10px var(--neon);
+      z-index: 999; transition: width .08s linear;
+    }
+
+    /* ─── Canvas particles ───────────────────── */
+    #particles {
+      position: fixed; inset: 0; z-index: 0;
+      pointer-events: none; opacity: .7;
+    }
+
+    /* ─── Ambient orbs ────────────────────────── */
+    .orb {
+      position: fixed; border-radius: 50%;
+      pointer-events: none; z-index: 0; filter: blur(80px);
+      animation: orbFloat 12s ease-in-out infinite alternate;
+    }
+    .orb-1 { width: 500px; height: 500px; top: -100px; left: -100px; background: rgba(14,165,233,.06); }
+    .orb-2 { width: 400px; height: 400px; bottom: -80px; right: -80px; background: rgba(14,165,233,.04); animation-delay: -6s; }
+    @keyframes orbFloat { from { transform: translate(0,0); } to { transform: translate(30px,40px); } }
+
+    /* ─── Typography util ────────────────────── */
+    .label {
+      display: inline-block; font-size: 11px; font-weight: 700;
+      letter-spacing: .16em; text-transform: uppercase;
+      color: var(--neon); margin-bottom: 16px;
+    }
+    .d1 { font-family: var(--bebas); font-size: clamp(3rem,7vw,6rem); line-height: 1; letter-spacing: .02em; color: var(--white); }
+    .d1 em { font-style: normal; background: linear-gradient(90deg,var(--neon),var(--neon2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .lead { font-size: 15px; color: var(--muted); line-height: 1.8; }
+
+    /* Neon underline */
+    .neon-bar { width: 0; height: 2px; background: linear-gradient(90deg,var(--neon),var(--neon2)); border-radius: 2px; box-shadow: 0 0 12px var(--neon); margin-bottom: 24px; transition: width 1.2s var(--ease); }
+    .neon-bar.visible { width: 48px; }
+
+    /* ─── Buttons ─────────────────────────────── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 14px 30px; border-radius: 10px;
+      font-size: 13.5px; font-weight: 600; letter-spacing: .04em;
+      cursor: none; border: none; transition: transform .3s var(--ease), box-shadow .3s; position: relative; overflow: hidden;
+    }
+    .btn::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,.08); opacity: 0; transition: opacity .3s; }
+    .btn:hover::after { opacity: 1; }
+
+    .btn-neon  { background: var(--neon); color: #000; }
+    .btn-neon:hover  { box-shadow: 0 0 40px var(--neon-g), 0 8px 32px rgba(14,165,233,.25); transform: translateY(-2px); }
+
+    .btn-glass { background: var(--glass); color: var(--white); border: 1px solid var(--glass-b); }
+    .btn-glass:hover { border-color: rgba(14,165,233,.4); color: var(--neon); box-shadow: 0 0 20px var(--neon-d); }
+
+    .btn-wa { background: #25D366; color: #fff; font-family: var(--bebas); font-size: 18px; letter-spacing: .08em; padding: 18px 44px; border-radius: 12px; }
+    .btn-wa:hover { background: #1eb85a; box-shadow: 0 0 48px rgba(37,211,102,.45); transform: translateY(-3px); }
+
+    /* ─── SCROLL ANIMATION SYSTEM ─────────────── */
+    /* fade up */
+    .sa { opacity: 0; transform: translateY(40px); transition: opacity .9s var(--ease), transform .9s var(--ease); }
+    /* from left */
+    .sa-l { opacity: 0; transform: translateX(-60px); transition: opacity .9s var(--ease), transform .9s var(--ease); }
+    /* from right */
+    .sa-r { opacity: 0; transform: translateX(60px); transition: opacity .9s var(--ease), transform .9s var(--ease); }
+    /* clip-path reveal */
+    .sa-clip { opacity: 0; clip-path: inset(0 0 100% 0); transition: clip-path 1.1s var(--ease), opacity .5s; }
+    /* scale up */
+    .sa-scale { opacity: 0; transform: scale(.88); transition: opacity .9s var(--ease), transform .9s var(--ease); }
+
+    .sa.in, .sa-l.in, .sa-r.in { opacity: 1; transform: translate(0); }
+    .sa-clip.in { opacity: 1; clip-path: inset(0 0 0% 0); }
+    .sa-scale.in { opacity: 1; transform: scale(1); }
+
+    /* stagger siblings */
+    [data-stagger] > * { opacity: 0; transform: translateY(32px); transition: opacity .8s var(--ease), transform .8s var(--ease); }
+    [data-stagger].in > * { opacity: 1; transform: translateY(0); }
+    [data-stagger].in > *:nth-child(1) { transition-delay: 0s; }
+    [data-stagger].in > *:nth-child(2) { transition-delay: .1s; }
+    [data-stagger].in > *:nth-child(3) { transition-delay: .2s; }
+    [data-stagger].in > *:nth-child(4) { transition-delay: .3s; }
+    [data-stagger].in > *:nth-child(5) { transition-delay: .4s; }
+    [data-stagger].in > *:nth-child(6) { transition-delay: .5s; }
+
+    /* ─── HEADER ──────────────────────────────── */
+    #hdr {
+      position: sticky; top: 0; z-index: 500; height: 72px;
+      background: rgba(3,3,10,.82); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(14,165,233,.1); transition: border-color .4s, background .4s;
+    }
+    #hdr.scrolled { border-color: rgba(14,165,233,.18); background: rgba(3,3,10,.94); }
+
+    .nav-w { display: flex; align-items: center; justify-content: space-between; height: 72px; }
+    .logo img { height: 32px; filter: brightness(0) invert(1); opacity: .9; }
+
+    .nav-links { display: flex; align-items: center; gap: 2px; }
+    .nav-links a, .nav-drop > span {
+      font-size: 12px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase;
+      color: var(--muted); padding: 8px 14px; border-radius: 8px;
+      transition: color .3s, background .3s; cursor: none; white-space: nowrap;
+    }
+    .nav-links a:hover, .nav-drop:hover > span { color: var(--white); background: rgba(255,255,255,.05); }
+    .nav-cta { background: var(--neon) !important; color: #000 !important; font-weight: 700 !important; box-shadow: 0 0 24px rgba(14,165,233,.3); }
+    .nav-cta:hover { box-shadow: 0 0 40px rgba(14,165,233,.55) !important; color: #000 !important; }
+
+    .nav-drop { position: relative; }
+    .nav-drop > span::after { content: ' ↓'; font-size: 9px; }
+    .nav-drop:hover .drop { opacity: 1; visibility: visible; transform: translateY(0); pointer-events: auto; }
+    .drop {
+      position: absolute; top: calc(100% + 12px); left: 0; min-width: 240px;
+      background: rgba(6,6,16,.97); border: 1px solid rgba(14,165,233,.2); border-radius: 14px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.6), 0 0 40px rgba(14,165,233,.06);
+      padding: 8px; opacity: 0; visibility: hidden; transform: translateY(-8px);
+      transition: all .3s var(--ease); pointer-events: none; backdrop-filter: blur(20px);
+    }
+    .drop a { display: block; font-size: 13px; font-weight: 400; text-transform: none; letter-spacing: 0; padding: 10px 14px; border-radius: 8px; color: var(--muted); transition: color .2s, background .2s; cursor: none; }
+    .drop a:hover { background: rgba(14,165,233,.08); color: var(--neon); }
+
+    .burger { display: none; flex-direction: column; gap: 5px; cursor: none; background: none; border: none; padding: 8px; }
+    .burger span { display: block; width: 22px; height: 2px; background: var(--muted); border-radius: 2px; transition: .3s; }
+
+    /* ─── HERO ────────────────────────────────── */
+    .hero { position: relative; height: calc(100vh - var(--nav-h)); min-height: 560px; display: flex; align-items: center; overflow: hidden; }
+    #hero-video { position: absolute; inset: 0; width: 100%; height: 115%; object-fit: cover; will-change: transform; }
+    .hero-overlay { position: absolute; inset: 0; background: linear-gradient(140deg,rgba(3,3,10,.88) 0%,rgba(14,165,233,.06) 60%,rgba(3,3,10,.82) 100%); }
+    .hero-fade    { position: absolute; bottom: 0; left: 0; right: 0; height: 200px; background: linear-gradient(to bottom,transparent,var(--bg)); z-index: 1; }
+
+    .hero-inner { position: relative; z-index: 2; max-width: 860px; }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: rgba(14,165,233,.09); border: 1px solid rgba(14,165,233,.28);
+      border-radius: 50px; padding: 7px 18px; margin-bottom: 28px;
+      font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--neon);
+      box-shadow: 0 0 28px rgba(14,165,233,.1);
+    }
+    .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: #22C55E; box-shadow: 0 0 10px #22C55E; }
+
+    /* Split-text hero title */
+    .hero-title { font-family: var(--bebas); font-size: clamp(4rem,11vw,9rem); line-height: .95; letter-spacing: .02em; color: var(--white); margin-bottom: 28px; }
+    .hero-title .line { display: block; overflow: hidden; padding-top: 10px; margin-top: -10px; }
+    .hero-title .line span { display: inline-block; transform: translateY(110%); animation: lineUp .9s var(--ease) forwards; }
+    .hero-title .line:nth-child(1) span { animation-delay: .1s; }
+    .hero-title .line:nth-child(2) span { animation-delay: .25s; }
+    .hero-title .line:nth-child(3) span { animation-delay: .4s; }
+    @keyframes lineUp { to { transform: translateY(0); } }
+
+    .hero-accent { background: linear-gradient(90deg,var(--neon),var(--neon2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+    /* Chrome / metallic text */
+    .hero-chrome {
+      background: linear-gradient(
+        105deg,
+        #c8d8e8 0%,
+        #ffffff 18%,
+        #ddeeff 32%,
+        #ffffff 46%,
+        #b8cede 60%,
+        #ffffff 74%,
+        #ccdaec 88%,
+        #ffffff 100%
+      );
+      background-size: 280% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: chromeShine 3.5s linear infinite;
+      filter: drop-shadow(0 0 28px rgba(255,255,255,.55)) drop-shadow(0 0 56px rgba(14,165,233,.2));
+    }
+    @keyframes chromeShine {
+      0%   { background-position: 0% center; }
+      100% { background-position: -280% center; }
+    }
+    .hero-sub { font-size: 16px; color: rgba(255,255,255,.62); max-width: 460px; line-height: 1.78; margin-bottom: 44px; opacity: 0; animation: fadeIn .8s .7s var(--ease) forwards; }
+    .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; opacity: 0; animation: fadeIn .8s .85s var(--ease) forwards; }
+    @keyframes fadeIn { to { opacity: 1; } }
+
+    /* Scroll hint */
+    .scroll-hint { position: absolute; bottom: 220px; right: 48px; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 12px; writing-mode: vertical-rl; font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--dim); animation: fadeIn .8s 1.2s both; }
+    .scroll-hint::after { content: ''; width: 1px; height: 60px; background: linear-gradient(to bottom,var(--neon),transparent); }
+
+    /* ─── MARQUEE ─────────────────────────────── */
+    .marquee-wrap { position: relative; z-index: 2; overflow: hidden; border-top: 1px solid rgba(255,255,255,.06); border-bottom: 1px solid rgba(255,255,255,.06); padding: 18px 0; background: rgba(255,255,255,.02); }
+    .marquee-track { display: flex; gap: 0; width: max-content; animation: marqueeAnim 28s linear infinite; }
+    .marquee-track span { font-family: var(--bebas); font-size: 1.1rem; letter-spacing: .1em; color: var(--dim); padding: 0 28px; white-space: nowrap; }
+    .marquee-track span.sep { color: var(--neon); padding: 0 8px; }
+    @keyframes marqueeAnim { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* ─── PILLARS ─────────────────────────────── */
+    .pillars { padding: 96px 0; position: relative; z-index: 2; }
+    .pillars-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+    .pillar {
+      background: var(--glass); border: 1px solid var(--glass-b); border-radius: 20px;
+      padding: 36px 26px 40px; position: relative; overflow: hidden;
+      transition: transform .5s var(--ease), border-color .5s, box-shadow .5s, background .5s;
+      will-change: transform;
+    }
+    .pillar::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg,transparent,var(--neon),transparent); opacity: 0; transition: opacity .4s; }
+    .pillar:hover { border-color: rgba(14,165,233,.3); background: rgba(14,165,233,.05); box-shadow: 0 0 40px rgba(14,165,233,.07); }
+    .pillar:hover::before { opacity: 1; }
+
+    .pillar-icon { color: var(--neon); margin-bottom: 20px; filter: drop-shadow(0 0 8px var(--neon)); }
+    .pillar-num  { font-family: var(--bebas); font-size: 3.5rem; color: rgba(14,165,233,.08); position: absolute; bottom: 12px; right: 16px; line-height: 1; }
+    .pillar-title { font-family: var(--bebas); font-size: 1.5rem; letter-spacing: .04em; color: var(--white); margin-bottom: 10px; }
+    .pillar-text  { font-size: 13.5px; color: var(--muted); line-height: 1.65; }
+
+    /* ─── STATS ───────────────────────────────── */
+    .stats { padding: 48px 0 80px; position: relative; z-index: 2; }
+    .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 2px; background: rgba(255,255,255,.05); border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,.07); }
+    .stat { padding: 48px 32px; background: var(--bg); text-align: center; }
+    .stat-num { font-family: var(--bebas); font-size: clamp(2.5rem,5vw,4.5rem); color: var(--white); letter-spacing: .02em; line-height: 1; display: block; }
+    .stat-num em { font-style: normal; -webkit-text-fill-color: transparent; background: linear-gradient(90deg,var(--neon),var(--neon2)); -webkit-background-clip: text; background-clip: text; }
+    .stat-label { font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-top: 8px; }
+
+    /* ─── ABOUT ───────────────────────────────── */
+    .about { padding: 120px 0; position: relative; z-index: 2; }
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+
+    .about-img-wrap { position: relative; border-radius: 24px; overflow: hidden; aspect-ratio: 4/5; will-change: transform; }
+    .about-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+    .about-img-wrap::before,
+    .about-img-wrap::after { content: ''; position: absolute; z-index: 2; width: 44px; height: 44px; }
+    .about-img-wrap::before { top: -1px; left: -1px; border-top: 2px solid var(--neon); border-left: 2px solid var(--neon); box-shadow: -4px -4px 20px var(--neon-d); border-radius: 4px 0 0 0; }
+    .about-img-wrap::after  { bottom: -1px; right: -1px; border-bottom: 2px solid var(--neon); border-right: 2px solid var(--neon); box-shadow: 4px 4px 20px var(--neon-d); border-radius: 0 0 4px 0; }
+
+    .about-text .d1 { margin-bottom: 24px; }
+    .about-body { display: flex; flex-direction: column; gap: 18px; margin-bottom: 36px; }
+    .about-body p { font-size: 14.5px; color: var(--muted); line-height: 1.85; }
+    .pull-quote { border-left: 2px solid var(--neon); padding: 14px 20px; background: rgba(14,165,233,.05); border-radius: 0 10px 10px 0; font-size: 15px; color: rgba(255,255,255,.82); font-style: italic; line-height: 1.75; }
+
+    /* ─── QUOTE / VIDEO ───────────────────────── */
+    .quote-sec { position: relative; padding: 140px 0; overflow: hidden; z-index: 2; }
+    #quote-video { position: absolute; inset: 0; width: 100%; height: 115%; object-fit: cover; will-change: transform; }
+    .quote-overlay { position: absolute; inset: 0; background: rgba(3,3,10,.8); }
+    .quote-overlay::before, .quote-overlay::after { content: ''; position: absolute; left: 0; right: 0; height: 1px; background: linear-gradient(90deg,transparent,rgba(14,165,233,.3),transparent); }
+    .quote-overlay::before { top: 0; }
+    .quote-overlay::after  { bottom: 0; }
+
+    .quote-body { position: relative; z-index: 2; text-align: center; }
+    .quote-text { font-family: var(--serif); font-style: italic; font-size: clamp(3rem,8vw,6.5rem); color: var(--white); line-height: 1.1; margin-bottom: 20px; text-shadow: 0 0 80px rgba(14,165,233,.3); }
+    .quote-line { width: 80px; height: 1px; background: var(--neon); margin: 0 auto 20px; box-shadow: 0 0 16px var(--neon); }
+    .quote-sub  { font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--dim); }
+
+    /* ─── PRODUCTS ────────────────────────────── */
+    .products { padding: 120px 0; position: relative; z-index: 2; }
+    .sec-head { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 56px; gap: 24px; flex-wrap: wrap; }
+
+    /* Featured */
+    .p-featured {
+      background: var(--glass); border: 1px solid var(--glass-b); border-radius: 24px;
+      display: grid; grid-template-columns: 1fr 1fr; overflow: hidden; margin-bottom: 20px;
+      backdrop-filter: blur(20px); transition: border-color .5s, box-shadow .5s;
+      will-change: transform;
+    }
+    .p-featured:hover { border-color: rgba(14,165,233,.25); box-shadow: 0 0 60px rgba(14,165,233,.06); }
+
+    .p-feat-img {
+      background: rgba(14,165,233,.03); display: flex; align-items: center; justify-content: center;
+      padding: 40px; min-height: 400px; position: relative; overflow: hidden;
+    }
+    .p-feat-img::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at center,rgba(14,165,233,.08) 0%,transparent 70%); }
+    .p-feat-img img { width: 100%; max-height: 340px; object-fit: contain; position: relative; z-index: 1; filter: drop-shadow(0 0 40px rgba(14,165,233,.2)); transition: transform .7s var(--ease), filter .7s; }
+    .p-featured:hover .p-feat-img img { transform: scale(1.05); filter: drop-shadow(0 0 64px rgba(14,165,233,.4)); }
+
+    .p-feat-body { padding: 52px 48px; display: flex; flex-direction: column; justify-content: center; }
+    .p-feat-body .d1   { font-size: clamp(2rem,3.5vw,3.2rem); margin-bottom: 16px; }
+    .p-feat-body .lead { margin-bottom: 32px; }
+
+    /* Product grid */
+    .p-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+
+    .p-card {
+      background: var(--glass); border: 1px solid var(--glass-b); border-radius: 20px;
+      overflow: hidden; backdrop-filter: blur(20px); display: flex; flex-direction: column;
+      position: relative; transition: border-color .5s, box-shadow .5s;
+      will-change: transform;
+    }
+    .p-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg,transparent,var(--neon),transparent); opacity: 0; transition: opacity .4s; }
+    .p-card:hover::before { opacity: 1; }
+    .p-card:hover { border-color: rgba(14,165,233,.25); box-shadow: 0 0 50px rgba(14,165,233,.07), 0 24px 60px rgba(0,0,0,.3); }
+
+    .p-img { background: rgba(14,165,233,.03); padding: 32px 24px; display: flex; align-items: center; justify-content: center; min-height: 220px; position: relative; overflow: hidden; }
+    .p-img::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at center,rgba(14,165,233,.06) 0%,transparent 70%); }
+    .p-img img { width: 100%; max-height: 180px; object-fit: contain; position: relative; z-index: 1; filter: drop-shadow(0 0 20px rgba(14,165,233,.15)); transition: transform .6s var(--ease), filter .6s; }
+    .p-card:hover .p-img img { transform: scale(1.07) translateY(-5px); filter: drop-shadow(0 0 36px rgba(14,165,233,.35)); }
+
+    .p-body { padding: 24px 26px 28px; flex: 1; display: flex; flex-direction: column; }
+    .p-name  { font-family: var(--bebas); font-size: 1.45rem; letter-spacing: .05em; color: var(--white); margin-bottom: 10px; }
+    .p-desc  { font-size: 13.5px; color: var(--muted); line-height: 1.65; flex: 1; margin-bottom: 20px; }
+    .p-link  { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--neon); transition: text-shadow .3s; cursor: none; }
+    .p-link svg { transition: transform .25s; }
+    .p-link:hover { text-shadow: 0 0 16px var(--neon); }
+    .p-link:hover svg { transform: translateX(5px); }
+
+    /* ─── CTA SECTION ─────────────────────────── */
+    .cta-sec { padding: 120px 0; position: relative; z-index: 2; }
+    .cta-card {
+      background: var(--glass); border: 1px solid rgba(14,165,233,.18); border-radius: 28px;
+      padding: 96px 80px; text-align: center; backdrop-filter: blur(20px); position: relative; overflow: hidden;
+    }
+    .cta-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg,transparent,var(--neon),transparent); }
+    .cta-card::after  { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg,transparent,rgba(14,165,233,.4),transparent); }
+    .cta-orb { position: absolute; width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle,rgba(14,165,233,.1) 0%,transparent 70%); left: 50%; top: 50%; transform: translate(-50%,-50%); pointer-events: none; animation: pulse 4s ease-in-out infinite alternate; }
+    @keyframes pulse { from { transform: translate(-50%,-50%) scale(1); } to { transform: translate(-50%,-50%) scale(1.2); opacity: .7; } }
+
+    .cta-title  { font-family: var(--bebas); font-size: clamp(2.5rem,6vw,5.5rem); letter-spacing: .03em; margin-bottom: 20px; color: var(--white); position: relative; z-index: 1; }
+    .cta-sub    { font-size: 16px; color: var(--muted); max-width: 540px; margin: 0 auto 52px; line-height: 1.8; position: relative; z-index: 1; }
+    .cta-acts   { display: flex; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap; position: relative; z-index: 1; margin-bottom: 56px; }
+    .cta-divider { height: 1px; background: rgba(255,255,255,.06); margin-bottom: 44px; position: relative; z-index: 1; }
+
+    .cta-info-row { display: flex; align-items: center; justify-content: center; gap: 48px; flex-wrap: wrap; position: relative; z-index: 1; }
+    .cta-item { display: flex; align-items: center; gap: 12px; }
+    .cta-ico { width: 40px; height: 40px; border-radius: 10px; background: rgba(14,165,233,.08); border: 1px solid rgba(14,165,233,.15); display: flex; align-items: center; justify-content: center; color: var(--neon); flex-shrink: 0; }
+    .cta-key { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); }
+    .cta-val { font-size: 14px; color: rgba(255,255,255,.78); }
+    .cta-val a:hover { color: var(--neon); }
+
+    /* ─── FOOTER ──────────────────────────────── */
+    footer { position: relative; z-index: 2; background: rgba(2,2,8,.9); border-top: 1px solid rgba(255,255,255,.05); padding: 72px 0 32px; }
+    .foot-grid { display: grid; grid-template-columns: 1.8fr 1fr 1fr; gap: 64px; padding-bottom: 52px; border-bottom: 1px solid rgba(255,255,255,.05); margin-bottom: 28px; }
+    .foot-logo img { height: 28px; filter: brightness(0) invert(1); opacity: .7; margin-bottom: 16px; }
+    .foot-about { font-size: 13.5px; color: var(--dim); line-height: 1.8; max-width: 280px; }
+    .foot-head { font-family: var(--bebas); font-size: 1rem; letter-spacing: .12em; color: rgba(255,255,255,.5); margin-bottom: 18px; }
+    .foot-links li + li { margin-top: 12px; }
+    .foot-links a { font-size: 13.5px; color: var(--dim); transition: color .3s; cursor: none; }
+    .foot-links a:hover { color: var(--neon); }
+    .foot-bottom { display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: var(--dim); flex-wrap: wrap; gap: 12px; }
+    .foot-socials { display: flex; gap: 10px; }
+    .foot-soc { width: 36px; height: 36px; border-radius: 9px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.07); display: flex; align-items: center; justify-content: center; color: var(--dim); transition: all .3s; cursor: none; }
+    .foot-soc:hover { background: rgba(14,165,233,.1); border-color: rgba(14,165,233,.3); color: var(--neon); }
+
+    /* ─── WHATSAPP FLOAT ──────────────────────── */
+    .wa-pulse { position: fixed; bottom: 22px; right: 22px; z-index: 298; width: 56px; height: 56px; border-radius: 50%; background: rgba(37,211,102,.25); animation: waPulse 2.5s ease-out infinite; pointer-events: none; }
+    @keyframes waPulse { 0% { transform: scale(1); opacity: .8; } 100% { transform: scale(2.5); opacity: 0; } }
+    .wa-float { position: fixed; bottom: 28px; right: 28px; z-index: 299; display: flex; align-items: center; gap: 10px; background: #25D366; border-radius: 50px; padding: 14px 22px 14px 18px; box-shadow: 0 4px 28px rgba(37,211,102,.4); transition: all .35s var(--ease); color: var(--white); font-family: var(--bebas); font-size: 15px; letter-spacing: .08em; cursor: none; }
+    .wa-float:hover { background: #1eb85a; box-shadow: 0 6px 44px rgba(37,211,102,.55); transform: translateY(-3px); }
+    .wa-float svg { width: 22px; height: 22px; fill: white; flex-shrink: 0; }
+
+    /* ─── Responsive ──────────────────────────── */
+    @media (max-width: 1024px) {
+      .pillars-grid { grid-template-columns: repeat(2,1fr); }
+      .stats-grid   { grid-template-columns: repeat(2,1fr); }
+      .about-grid   { grid-template-columns: 1fr; gap: 52px; }
+      .about-img-wrap { max-width: 460px; }
+      .p-featured   { grid-template-columns: 1fr; }
+      .p-feat-img   { min-height: 300px; }
+      .p-feat-body  { padding: 40px; }
+      .p-grid       { grid-template-columns: repeat(2,1fr); }
+      .cta-card     { padding: 64px 40px; }
+      .cta-info-row { gap: 28px; }
+      .foot-grid    { grid-template-columns: 1fr 1fr; gap: 40px; }
+    }
+    @media (max-width: 768px) {
+      body { cursor: auto; }
+      #cursor-dot, #cursor-ring { display: none; }
+      .nav-links { display: none; position: fixed; top: 72px; inset-inline: 0; background: rgba(3,3,10,.98); border-bottom: 1px solid rgba(14,165,233,.15); flex-direction: column; align-items: stretch; padding: 12px; gap: 2px; }
+      .nav-links.open { display: flex; }
+      .nav-links a, .nav-drop > span { padding: 12px 16px; font-size: 13px; cursor: auto; }
+      .drop { position: static; opacity: 1; visibility: visible; transform: none; pointer-events: auto; background: transparent; border: none; box-shadow: none; padding: 0 0 0 16px; }
+      .burger { display: flex; cursor: auto; }
+      .scroll-hint { display: none; }
+      .pillars-grid, .stats-grid, .p-grid { grid-template-columns: 1fr; }
+      .p-featured { grid-template-columns: 1fr; }
+      .cta-card { padding: 48px 24px; }
+      .cta-info-row { flex-direction: column; gap: 20px; align-items: flex-start; padding: 0 20px; }
+      .foot-grid { grid-template-columns: 1fr; gap: 32px; }
+      .foot-bottom { flex-direction: column; align-items: flex-start; gap: 16px; }
+      .sec-head { flex-direction: column; align-items: flex-start; }
+      .btn, .wa-float, .foot-links a, .drop a, .p-link { cursor: auto; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Custom cursor -->
+<div id="cursor-dot"></div>
+<div id="cursor-ring"></div>
+
+<!-- Scroll progress -->
+<div id="prog"></div>
+
+<!-- Ambient -->
+<canvas id="particles"></canvas>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+
+<!-- ══════ HEADER ══════ -->
+<header id="hdr">
+  <div class="container">
+    <nav class="nav-w">
+      <a href="printdreams3d.html" class="logo">
+        <img src="https://static.wixstatic.com/media/b9c99c_bc2ee588659a448d87d594ba874b4fdd~mv2.png" alt="PrintDreams 3D">
+      </a>
+      <div class="nav-links" id="navLinks">
+        <a href="printdreams3d.html">Home</a>
+        <a href="#sobre">A Empresa</a>
+        <div class="nav-drop">
+          <span>Produtos</span>
+          <div class="drop">
+            <a href="printdreams3d/protese-mecanica.html">Prótese Mecânica</a>
+            <a href="printdreams3d/capa-de-membro-inferior.html">Capa 3D — Membro Inferior</a>
+            <a href="printdreams3d/componentes-protese.html">Componentes Prótese</a>
+          </div>
+        </div>
+        <a href="printdreams3d/blog.html">Blog</a>
+        <a href="https://api.whatsapp.com/send?phone=5519989485354&text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20os%20produtos%20da%20PrintDreams%203D." target="_blank" rel="noopener" class="nav-cta">WhatsApp</a>
+      </div>
+      <button class="burger" id="burger" aria-label="Menu"><span></span><span></span><span></span></button>
+    </nav>
+  </div>
+</header>
+
+<!-- ══════ HERO ══════ -->
+<section class="hero">
+  <video id="hero-video" autoplay muted loop playsinline
+    poster="https://static.wixstatic.com/media/b9c99c_486441471d8743fbb5f5314c038e9eabf000.jpg">
+    <source src="https://video.wixstatic.com/video/b9c99c_486441471d8743fbb5f5314c038e9eab/720p/mp4/file.mp4" type="video/mp4">
+    <source src="https://video.wixstatic.com/video/b9c99c_486441471d8743fbb5f5314c038e9eab/480p/mp4/file.mp4" type="video/mp4">
+  </video>
+  <div class="hero-overlay"></div>
+  <div class="hero-fade"></div>
+  <div class="container">
+    <div class="hero-inner">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        Manufatura Aditiva 3D · Campinas, Brasil
+      </div>
+      <h1 class="hero-title">
+        <span class="line"><span class="hero-chrome">PRÓTESES</span></span>
+        <span class="line"><span class="hero-accent">LEVES E</span></span>
+        <span class="line"><span class="hero-chrome">ACESSÍVEIS</span></span>
+      </h1>
+      <p class="hero-sub">Feitas sob medida para você. Tecnologia de ponta,<br>design personalizado, vida transformada.</p>
+      <div class="hero-actions">
+        <a href="#produtos" class="btn btn-neon">Ver Produtos</a>
+        <a href="https://api.whatsapp.com/send?phone=5519989485354&text=Olá!%20Quero%20saber%20mais." target="_blank" rel="noopener" class="btn btn-glass">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Fale Conosco
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-hint">Scroll</div>
+</section>
+
+<!-- ══════ MARQUEE ══════ -->
+<div class="marquee-wrap">
+  <div class="marquee-track" aria-hidden="true">
+    <span>PRÓTESE 3D</span><span class="sep">◆</span>
+    <span>CAPA DE MEMBRO INFERIOR</span><span class="sep">◆</span>
+    <span>MANUFATURA ADITIVA</span><span class="sep">◆</span>
+    <span>CAMPINAS SP</span><span class="sep">◆</span>
+    <span>SOB MEDIDA</span><span class="sep">◆</span>
+    <span>COMPONENTES 3D</span><span class="sep">◆</span>
+    <span>INOVAÇÃO BRASILEIRA</span><span class="sep">◆</span>
+    <!-- duplicate for seamless loop -->
+    <span>PRÓTESE 3D</span><span class="sep">◆</span>
+    <span>CAPA DE MEMBRO INFERIOR</span><span class="sep">◆</span>
+    <span>MANUFATURA ADITIVA</span><span class="sep">◆</span>
+    <span>CAMPINAS SP</span><span class="sep">◆</span>
+    <span>SOB MEDIDA</span><span class="sep">◆</span>
+    <span>COMPONENTES 3D</span><span class="sep">◆</span>
+    <span>INOVAÇÃO BRASILEIRA</span><span class="sep">◆</span>
+  </div>
+</div>
+
+<!-- ══════ PILLARS ══════ -->
+<section class="pillars">
+  <div class="container">
+    <div class="pillars-grid" data-stagger>
+      <div class="pillar">
+        <div class="pillar-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div>
+        <h3 class="pillar-title">Sob Medida</h3>
+        <p class="pillar-text">Produtos adaptados anatomicamente a cada indivíduo, garantindo máximo conforto e funcionalidade.</p>
+        <span class="pillar-num">01</span>
+      </div>
+      <div class="pillar">
+        <div class="pillar-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
+        <h3 class="pillar-title">Acessível</h3>
+        <p class="pillar-text">Nosso processo torna possível a produção de próteses muito mais acessíveis, democratizando a tecnologia.</p>
+        <span class="pillar-num">02</span>
+      </div>
+      <div class="pillar">
+        <div class="pillar-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+        <h3 class="pillar-title">Customizada</h3>
+        <p class="pillar-text">Você escolhe o estilo, cor e desenho. Expressa sua personalidade com total liberdade criativa.</p>
+        <span class="pillar-num">03</span>
+      </div>
+      <div class="pillar">
+        <div class="pillar-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <h3 class="pillar-title">Assistência</h3>
+        <p class="pillar-text">Mantemos estreito relacionamento de cooperação com nossos clientes ao longo de toda a jornada.</p>
+        <span class="pillar-num">04</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ STATS ══════ -->
+<section class="stats">
+  <div class="container">
+    <div class="stats-grid" data-stagger>
+      <div class="stat">
+        <span class="stat-num"><em data-count="7">0</em> Anos</span>
+        <p class="stat-label">de Inovação</p>
+      </div>
+      <div class="stat">
+        <span class="stat-num"><em data-count="100">0</em>%</span>
+        <p class="stat-label">Personalizado</p>
+      </div>
+      <div class="stat">
+        <span class="stat-num"><em data-count="4">0</em> Linhas</span>
+        <p class="stat-label">de Produtos</p>
+      </div>
+      <div class="stat">
+        <span class="stat-num"><em data-count="2019">0</em></span>
+        <p class="stat-label">Fundada em</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ ABOUT ══════ -->
+<section class="about" id="sobre">
+  <div class="container">
+    <div class="about-grid">
+      <div class="about-img-wrap sa-l">
+        <img src="https://static.wixstatic.com/media/b9c99c_d2edad381669468d9c522f0552138082~mv2.jpg" alt="PrintDreams 3D — Tecnologia" loading="lazy">
+      </div>
+      <div class="sa-r">
+        <div class="neon-bar"></div>
+        <span class="label">A Empresa</span>
+        <h2 class="d1" style="margin-bottom:24px">AJUDAMOS<br>PESSOAS A<br><em>SEREM LIVRES</em></h2>
+        <div class="about-body">
+          <p>Desenvolvemos órteses e próteses sob medida, utilizando tecnologias digitais de tratamento de imagens integradas a processos de manufatura aditiva 3D.</p>
+          <div class="pull-quote">"Estas tecnologias nos permitem produzir próteses de acordo com a anatomia de cada indivíduo, melhorando desempenho, autoestima e qualidade de vida."</div>
+          <p>A PrintDreams 3D mantém estreito relacionamento com Profissionais e Centros de P&amp;D nas áreas de Medicina, Fisioterapia, Terapia Ocupacional, Tecnologia e Engenharia.</p>
+        </div>
+        <a href="https://api.whatsapp.com/send?phone=5519989485354&text=Olá!%20Quero%20conhecer%20mais%20sobre%20a%20PrintDreams%203D." target="_blank" rel="noopener" class="btn btn-neon">Fale com nossa equipe</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ QUOTE / VIDEO ══════ -->
+<section class="quote-sec">
+  <video id="quote-video" autoplay muted loop playsinline
+    poster="https://static.wixstatic.com/media/b9c99c_c5663935069745d4aaf8f2ab14ec2a09f000.jpg">
+    <source src="https://video.wixstatic.com/video/b9c99c_c5663935069745d4aaf8f2ab14ec2a09/720p/mp4/file.mp4" type="video/mp4">
+    <source src="https://video.wixstatic.com/video/b9c99c_c5663935069745d4aaf8f2ab14ec2a09/480p/mp4/file.mp4" type="video/mp4">
+  </video>
+  <div class="quote-overlay"></div>
+  <div class="container">
+    <div class="quote-body sa">
+      <p class="quote-text">Movidos por sonhos</p>
+      <div class="quote-line"></div>
+      <p class="quote-sub">PrintDreams 3D — Campinas, Brasil</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ PRODUCTS ══════ -->
+<section class="products" id="produtos">
+  <div class="container">
+    <div class="sec-head sa">
+      <div>
+        <div class="neon-bar"></div>
+        <span class="label">Catálogo</span>
+        <h2 class="d1">NOSSOS<br><em>PRODUTOS</em></h2>
+      </div>
+      <a href="https://api.whatsapp.com/send?phone=5519989485354&text=Olá!%20Gostaria%20de%20solicitar%20um%20orçamento." target="_blank" rel="noopener" class="btn btn-neon">Solicitar Orçamento</a>
+    </div>
+
+    <div class="p-featured sa-scale">
+      <div class="p-feat-img">
+        <img src="https://static.wixstatic.com/media/b9c99c_32a93d30e6fe405aac75be3dcac2bd3e~mv2.png" alt="Capa de Membro Inferior" loading="lazy">
+      </div>
+      <div class="p-feat-body">
+        <span class="label">Produto em Destaque</span>
+        <h3 class="d1" style="font-size:clamp(2rem,3.5vw,3.2rem);margin-bottom:16px">CAPA DE<br><em>MEMBRO INFERIOR</em></h3>
+        <p class="lead" style="margin-bottom:32px">Capas 3D personalizadas para próteses de membro inferior — estéticas, leves e duráveis. Tecnologia de ponta combinada com design individual para cada paciente.</p>
+        <a href="printdreams3d/capa-de-membro-inferior.html" class="btn btn-neon" style="align-self:flex-start">
+          Ver Detalhes
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="p-grid" data-stagger>
+      <div class="p-card">
+        <div class="p-img"><img src="https://static.wixstatic.com/media/b9c99c_ddfb06df084640bf9fc8cfa80d113adc~mv2.png" alt="Prótese de Membro Superior" loading="lazy"></div>
+        <div class="p-body">
+          <h3 class="p-name">Prótese de Membro Superior</h3>
+          <p class="p-desc">Próteses de mão e braço leves, duráveis e totalmente personalizáveis em estilo, cor e design.</p>
+          <a href="printdreams3d/protese-mecanica.html" class="p-link">Ver Produto <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+        </div>
+      </div>
+      <div class="p-card">
+        <div class="p-img"><img src="https://static.wixstatic.com/media/b9c99c_6f16be5357b648389eb1cf00d31bc4c7~mv2.png" alt="Componentes Prótese" loading="lazy"></div>
+        <div class="p-body">
+          <h3 class="p-name">Componentes Prótese</h3>
+          <p class="p-desc">Peças e componentes impressos em 3D para reposição e montagem com alta qualidade e precisão dimensional.</p>
+          <a href="printdreams3d/componentes-protese.html" class="p-link">Ver Produto <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ CTA ══════ -->
+<section class="cta-sec" id="contato">
+  <div class="container">
+    <div class="cta-card sa">
+      <div class="cta-orb"></div>
+      <h2 class="cta-title">PRONTO PARA<br><span style="background:linear-gradient(90deg,var(--neon),var(--neon2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">TRANSFORMAR</span><br>SUA VIDA?</h2>
+      <p class="cta-sub">Se você ou alguém próximo precisa de uma prótese ou órtese personalizada, fale com nossa equipe agora mesmo pelo WhatsApp.</p>
+      <div class="cta-acts">
+        <a href="https://api.whatsapp.com/send?phone=5519989485354&text=Olá!%20Gostaria%20de%20solicitar%20uma%20avaliação%20para%20prótese%20na%20PrintDreams%203D." target="_blank" rel="noopener" class="btn btn-wa">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          FALAR NO WHATSAPP
+        </a>
+        <a href="mailto:contato@printdreams3d.com" class="btn btn-glass">contato@printdreams3d.com</a>
+      </div>
+      <div class="cta-divider"></div>
+      <div class="cta-info-row">
+        <div class="cta-item">
+          <div class="cta-ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 014.36 12 19.79 19.79 0 011.27 3.4 2 2 0 013.27 1.22h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L7.91 8.56a16 16 0 006.29 6.29l1.41-1.41a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7a2 2 0 011.72 2.03z"/></svg></div>
+          <div><p class="cta-key">Telefone</p><p class="cta-val"><a href="tel:+5519993989975">+55 (19) 99398.9975</a></p></div>
+        </div>
+        <div class="cta-item">
+          <div class="cta-ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+          <div><p class="cta-key">Endereço</p><p class="cta-val">Rua Eduardo Garcia, 313 · Campinas – SP</p></div>
+        </div>
+        <div class="cta-item">
+          <div class="cta-ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></div>
+          <div><p class="cta-key">Instagram</p><p class="cta-val"><a href="https://instagram.com/printdreams3d" target="_blank" rel="noopener">@printdreams3d</a></p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ FOOTER ══════ -->
+<footer>
+  <div class="container">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-logo"><img src="https://static.wixstatic.com/media/b9c99c_bc2ee588659a448d87d594ba874b4fdd~mv2.png" alt="PrintDreams 3D"></div>
+        <p class="foot-about">Empresa brasileira especializada no desenvolvimento de próteses e órteses personalizadas com manufatura aditiva 3D. Campinas, SP.</p>
+      </div>
+      <div>
+        <p class="foot-head">Produtos</p>
+        <ul class="foot-links">
+          <li><a href="printdreams3d/protese-mecanica.html">Prótese Mecânica</a></li>
+          <li><a href="printdreams3d/capa-de-membro-inferior.html">Capa 3D Membro Inferior</a></li>
+          <li><a href="printdreams3d/componentes-protese.html">Componentes Prótese</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="foot-head">Links</p>
+        <ul class="foot-links">
+          <li><a href="printdreams3d.html">Home</a></li>
+          <li><a href="#sobre">A Empresa</a></li>
+          <li><a href="printdreams3d/blog.html">Blog</a></li>
+          <li><a href="#contato">Contato</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <p>© 2026 PrintDreams 3D. Todos os direitos reservados.</p>
+      <div class="foot-socials">
+        <a href="http://www.facebook.com/printdreams3d" target="_blank" rel="noopener" class="foot-soc" title="Facebook"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg></a>
+        <a href="https://instagram.com/printdreams3d" target="_blank" rel="noopener" class="foot-soc" title="Instagram"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+        <a href="https://api.whatsapp.com/send?phone=5519989485354" target="_blank" rel="noopener" class="foot-soc" title="WhatsApp"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ══════ WHATSAPP FLOAT ══════ -->
+<div class="wa-pulse"></div>
+<a href="https://api.whatsapp.com/send?phone=5519989485354&text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20os%20produtos%20da%20PrintDreams%203D." target="_blank" rel="noopener" class="wa-float">
+  <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+  FALE CONOSCO
+</a>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── Custom Cursor ─────────────────────────── */
+  const dot  = document.getElementById('cursor-dot');
+  const ring = document.getElementById('cursor-ring');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+
+  function animateCursor() {
+    dot.style.left  = mx + 'px';
+    dot.style.top   = my + 'px';
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top  = ry + 'px';
+    requestAnimationFrame(animateCursor);
+  }
+  animateCursor();
+
+  document.querySelectorAll('a, button, .pillar, .p-card, .p-featured, .btn').forEach(el => {
+    el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+    el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+  });
+
+  /* ── Progress bar ──────────────────────────── */
+  const prog = document.getElementById('prog');
+  function updateProg() {
+    const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+    prog.style.width = Math.min(pct, 100) + '%';
+  }
+
+  /* ── Header ────────────────────────────────── */
+  const hdr = document.getElementById('hdr');
+  function updateHeader() { hdr.classList.toggle('scrolled', window.scrollY > 30); }
+
+  /* ── Parallax ──────────────────────────────── */
+  const heroVid  = document.getElementById('hero-video');
+  const quoteVid = document.getElementById('quote-video');
+  function updateParallax() {
+    const sy = window.scrollY;
+    if (heroVid)  heroVid.style.transform  = `translateY(${sy * 0.38}px)`;
+    if (quoteVid) {
+      const rect = quoteVid.closest('.quote-sec').getBoundingClientRect();
+      quoteVid.style.transform = `translateY(${-rect.top * 0.3}px)`;
+    }
+  }
+
+  /* ── neon-bar scroll reveal ────────────────── */
+  function revealBars() {
+    document.querySelectorAll('.neon-bar').forEach(b => {
+      if (b.getBoundingClientRect().top < window.innerHeight * 0.92) b.classList.add('visible');
+    });
+  }
+
+  /* ── Scroll handler ────────────────────────── */
+  window.addEventListener('scroll', () => {
+    updateProg();
+    updateHeader();
+    updateParallax();
+    revealBars();
+  }, { passive: true });
+  updateHeader(); revealBars();
+
+  /* ── IntersectionObserver ──────────────────── */
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      e.target.classList.add('in');
+      // trigger children stagger text on neon-bar siblings
+    });
+  }, { threshold: 0.08 });
+
+  document.querySelectorAll('.sa, .sa-l, .sa-r, .sa-clip, .sa-scale, [data-stagger]')
+    .forEach(el => io.observe(el));
+
+  /* ── Counter animation ─────────────────────── */
+  const counterIO = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      e.target.querySelectorAll('[data-count]').forEach(el => {
+        const target = +el.dataset.count;
+        const duration = target > 100 ? 2000 : 1200;
+        const step = target > 100 ? 16 : 20;
+        let current = 0;
+        const inc = target / (duration / step);
+        const t = setInterval(() => {
+          current = Math.min(current + inc, target);
+          el.textContent = Math.round(current);
+          if (current >= target) clearInterval(t);
+        }, step);
+      });
+      counterIO.unobserve(e.target);
+    });
+  }, { threshold: 0.3 });
+  document.querySelectorAll('.stats-grid').forEach(el => counterIO.observe(el));
+
+  /* ── 3D Card tilt ──────────────────────────── */
+  if (window.innerWidth > 768) {
+    document.querySelectorAll('.pillar, .p-card, .p-featured').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const r = card.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width  - 0.5;
+        const y = (e.clientY - r.top)  / r.height - 0.5;
+        const mag = card.classList.contains('p-featured') ? 6 : 10;
+        card.style.transform = `perspective(900px) rotateY(${x * mag}deg) rotateX(${-y * mag}deg) translateY(-5px)`;
+      });
+      card.addEventListener('mouseleave', () => { card.style.transform = ''; });
+    });
+
+    /* Magnetic buttons */
+    document.querySelectorAll('.btn').forEach(btn => {
+      btn.addEventListener('mousemove', e => {
+        const r = btn.getBoundingClientRect();
+        const x = e.clientX - r.left - r.width  / 2;
+        const y = e.clientY - r.top  - r.height / 2;
+        btn.style.transform = `translate(${x * 0.18}px, ${y * 0.18}px)`;
+      });
+      btn.addEventListener('mouseleave', () => { btn.style.transform = ''; });
+    });
+  }
+
+  /* ── Canvas Particles ──────────────────────── */
+  if (window.innerWidth > 768) {
+    const canvas = document.getElementById('particles');
+    const ctx    = canvas.getContext('2d');
+    let W, H, pts = [];
+
+    function resize() {
+      W = canvas.width  = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    function Pt() {
+      this.x  = Math.random() * W;
+      this.y  = Math.random() * H;
+      this.vx = (Math.random() - .5) * .45;
+      this.vy = (Math.random() - .5) * .45;
+      this.r  = Math.random() * 1.6 + .4;
+      this.a  = Math.random() * .5 + .1;
+    }
+
+    for (let i = 0; i < 70; i++) pts.push(new Pt());
+
+    let mouseX = W / 2, mouseY = H / 2;
+    document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
+
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      pts.forEach(p => {
+        // subtle mouse repulsion
+        const dx = p.x - mouseX, dy = p.y - mouseY;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < 120) { p.x += dx / dist * .5; p.y += dy / dist * .5; }
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < 0 || p.x > W) p.vx *= -1;
+        if (p.y < 0 || p.y > H) p.vy *= -1;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(14,165,233,${p.a})`;
+        ctx.fill();
+      });
+
+      // Connect nearby particles
+      for (let i = 0; i < pts.length; i++) {
+        for (let j = i + 1; j < pts.length; j++) {
+          const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y;
+          const d  = Math.sqrt(dx*dx + dy*dy);
+          if (d < 110) {
+            ctx.strokeStyle = `rgba(14,165,233,${(1 - d/110) * .12})`;
+            ctx.lineWidth = .6;
+            ctx.beginPath();
+            ctx.moveTo(pts[i].x, pts[i].y);
+            ctx.lineTo(pts[j].x, pts[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(draw);
+    }
+    draw();
+  }
+
+  /* ── Mobile menu ───────────────────────────── */
+  const burger   = document.getElementById('burger');
+  const navLinks = document.getElementById('navLinks');
+  burger.addEventListener('click', () => navLinks.classList.toggle('open'));
+  navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => navLinks.classList.remove('open')));
+
+})();
+</script>
+</body>
+</html>
