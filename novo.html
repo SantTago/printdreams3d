@@ -200,18 +200,26 @@ body.cur-click #cursor-ring{width:22px;height:22px;border-color:var(--neon2)}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 .hero-h1{
   font-family:var(--bebas);
-  font-size:clamp(2.4rem,5vw,4.5rem);
-  line-height:.95;letter-spacing:.04em;
-  color:#fff;margin-bottom:10px;
+  font-size:clamp(2rem,4.5vw,4.2rem);
+  line-height:1.05;letter-spacing:.03em;
+  color:#fff;margin:0 0 10px;
   text-shadow:0 0 80px rgba(14,165,233,.2);
+  word-break:break-word;
 }
 .hero-h1 span{
-  display:block;
+  display:inline;
   background:linear-gradient(90deg,var(--neon),var(--neon2));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
 }
-.hero-sub{font-size:clamp(.82rem,1.4vw,.95rem);color:rgba(255,255,255,.68);max-width:440px;margin-bottom:20px;line-height:1.6}
+.hero-sub{font-size:clamp(.8rem,1.3vw,.92rem);color:rgba(255,255,255,.68);max-width:420px;margin-bottom:20px;line-height:1.6}
 @media(min-width:1200px){.hero-content{padding-top:0}.hero-sub{display:block}}
+@media(max-width:768px){
+  .hero-content{padding:0 20px;max-width:100%}
+  .hero-h1{font-size:clamp(1.7rem,7vw,2.8rem);line-height:1.08}
+  .hero-sub{font-size:.82rem;max-width:100%}
+  .hero-btns{gap:8px}
+  .btn-neon,.btn-glass{padding:10px 18px;font-size:12px}
+}
 .hero-btns{display:flex;gap:12px;flex-wrap:wrap}
 .btn-neon{
   padding:13px 28px;border-radius:9px;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
@@ -525,30 +533,8 @@ footer{border-top:1px solid var(--gb);padding:clamp(40px,5vw,64px) clamp(16px,5v
 <section class="hero" id="hero">
   <div class="hero-slides" id="heroSlides">
 
-    <!-- Slide 1: Capas 3D -->
+    <!-- Slide 1: Impressora Icarus -->
     <div class="hero-slide active">
-      <div class="hero-slide-bg"></div>
-      <div class="hex-bg"></div>
-      <div class="tech-lines"></div>
-      <div class="orb orb-tl"></div>
-      <div class="orb orb-br"></div>
-      <div class="slide-overlay"></div>
-      <div class="hero-content">
-        <div class="hero-tag">Produto em Destaque</div>
-        <h1 class="hero-h1">CAPAS 3D<br><span>PERSONALIZADAS</span><br>PARA PRÓTESES</h1>
-        <p class="hero-sub">Design exclusivo com estampas personalizadas. Proteção e identidade para cada prótese de perna — do básico ao hardcore.</p>
-        <div class="hero-btns">
-          <a href="capa-de-membro-inferior.html" class="btn-neon">Ver Coleção</a>
-          <a href="https://api.whatsapp.com/send?phone=5519989485354" class="btn-glass" target="_blank">Solicitar Orçamento</a>
-        </div>
-      </div>
-      <div class="hero-right">
-        <img class="hero-img" src="imagens/CAPAS%20PARA%20PR%C3%93TESES%20DE%20PERNA.png" alt="Capa 3D"/>
-      </div>
-    </div>
-
-    <!-- Slide 2: Impressora Icarus -->
-    <div class="hero-slide">
       <div class="hero-slide-bg"></div>
       <div class="hex-bg-lg"></div>
       <div class="tech-lines"></div>
@@ -557,7 +543,7 @@ footer{border-top:1px solid var(--gb);padding:clamp(40px,5vw,64px) clamp(16px,5v
       <div class="slide-overlay"></div>
       <div class="hero-content">
         <div class="hero-tag">Equipamento Profissional</div>
-        <h1 class="hero-h1">IMPRESSORA 3D<br><span>ICARUS LITE</span><br>PROFISSIONAL</h1>
+        <h1 class="hero-h1">IMPRESSORA 3D <span>ICARUS LITE</span> PROFISSIONAL</h1>
         <p class="hero-sub">Alta precisão para produção de peças ortopédicas. Tecnologia de ponta para laboratórios e clínicas de reabilitação.</p>
         <div class="hero-btns">
           <a href="#icarus" class="btn-neon">Conheça o Equipamento</a>
@@ -566,6 +552,28 @@ footer{border-top:1px solid var(--gb);padding:clamp(40px,5vw,64px) clamp(16px,5v
       </div>
       <div class="hero-right">
         <img class="hero-img" src="imagens/impressora%203d.png" alt="Impressora 3D"/>
+      </div>
+    </div>
+
+    <!-- Slide 2: Capas 3D -->
+    <div class="hero-slide">
+      <div class="hero-slide-bg"></div>
+      <div class="hex-bg"></div>
+      <div class="tech-lines"></div>
+      <div class="orb orb-tl"></div>
+      <div class="orb orb-br"></div>
+      <div class="slide-overlay"></div>
+      <div class="hero-content">
+        <div class="hero-tag">Produto em Destaque</div>
+        <h1 class="hero-h1">CAPAS 3D <span>PERSONALIZADAS</span> PARA PRÓTESES</h1>
+        <p class="hero-sub">Design exclusivo com estampas personalizadas. Proteção e identidade para cada prótese de perna — do básico ao hardcore.</p>
+        <div class="hero-btns">
+          <a href="capa-de-membro-inferior.html" class="btn-neon">Ver Coleção</a>
+          <a href="https://api.whatsapp.com/send?phone=5519989485354" class="btn-glass" target="_blank">Solicitar Orçamento</a>
+        </div>
+      </div>
+      <div class="hero-right">
+        <img class="hero-img" src="imagens/CAPAS%20PARA%20PR%C3%93TESES%20DE%20PERNA.png" alt="Capa 3D"/>
       </div>
     </div>
 
@@ -579,7 +587,7 @@ footer{border-top:1px solid var(--gb);padding:clamp(40px,5vw,64px) clamp(16px,5v
       <div class="slide-overlay"></div>
       <div class="hero-content">
         <div class="hero-tag">Linha Premium</div>
-        <h1 class="hero-h1">PRÓTESES DE MÃO<br><span>PERSONALIZADAS</span></h1>
+        <h1 class="hero-h1">PRÓTESES DE MÃO <span>PERSONALIZADAS</span></h1>
         <p class="hero-sub">Próteses funcionais e estéticas para membros superiores. Materiais de alta performance, design sob medida.</p>
         <div class="hero-btns">
           <a href="protese-mecanica.html" class="btn-neon">Ver Modelos</a>
@@ -600,7 +608,7 @@ footer{border-top:1px solid var(--gb);padding:clamp(40px,5vw,64px) clamp(16px,5v
       <div class="slide-overlay"></div>
       <div class="hero-content">
         <div class="hero-tag">Componente de Alta Performance</div>
-        <h1 class="hero-h1">PÉS EM CARBONO<br><span>SOB MEDIDA</span></h1>
+        <h1 class="hero-h1">PÉS EM CARBONO <span>SOB MEDIDA</span></h1>
         <p class="hero-sub">Componentes em fibra de carbono para próteses de alta performance. Leveza máxima, resistência superior.</p>
         <div class="hero-btns">
           <a href="#produtos" class="btn-neon">Saiba Mais</a>
@@ -622,7 +630,7 @@ footer{border-top:1px solid var(--gb);padding:clamp(40px,5vw,64px) clamp(16px,5v
       <div class="slide-overlay"></div>
       <div class="hero-content">
         <div class="hero-tag">Missão PrintDreams</div>
-        <h1 class="hero-h1">TECNOLOGIA<br><span>PARA REABILITAÇÃO</span><br>E ORTOPEDIA</h1>
+        <h1 class="hero-h1">TECNOLOGIA <span>PARA REABILITAÇÃO</span> E ORTOPEDIA</h1>
         <p class="hero-sub">Da matéria-prima ao produto final — soluções completas em impressão 3D para próteses, órteses e encaixes.</p>
         <div class="hero-btns">
           <a href="#sobre" class="btn-neon">Conheça a Empresa</a>
@@ -653,7 +661,7 @@ footer{border-top:1px solid var(--gb);padding:clamp(40px,5vw,64px) clamp(16px,5v
       <span class="stat-l">Pacientes Atendidos</span>
     </div>
     <div class="stat-item reveal" data-d="3">
-      <span class="stat-n"><em data-count="7">0</em></span>
+      <span class="stat-n"><em data-count="6">0</em></span>
       <span class="stat-l">Produtos no Catálogo</span>
     </div>
     <div class="stat-item reveal" data-d="4">
@@ -710,7 +718,6 @@ footer{border-top:1px solid var(--gb);padding:clamp(40px,5vw,64px) clamp(16px,5v
       <button class="pcat-btn" data-cat="capas">Capas</button>
       <button class="pcat-btn" data-cat="proteses">Próteses</button>
       <button class="pcat-btn" data-cat="componentes">Componentes</button>
-      <button class="pcat-btn" data-cat="equipamentos">Equipamentos</button>
     </div>
 
     <!-- TODOS -->
@@ -744,11 +751,6 @@ footer{border-top:1px solid var(--gb);padding:clamp(40px,5vw,64px) clamp(16px,5v
         <div class="prod-card-img"><img src="imagens/PR%C3%93TESES%20DE%20M%C3%83O.png" alt="Próteses de Mão" style="object-fit:contain;padding:12px;background:var(--bg2)"/><span class="prod-badge">Personalizado</span></div>
         <div class="prod-body"><h3>Próteses de Mão Personalizadas</h3><p>Próteses de membros superiores em impressão 3D. Design funcional e estético, produção sob medida.</p></div>
         <div class="prod-footer"><a href="protese-mecanica.html" class="prod-link">Ver Modelos ›</a><span class="prod-tag">Prótese</span></div>
-      </div>
-      <div class="prod-card">
-        <div class="prod-card-img"><img src="imagens/impressora%203d.png" alt="Impressora 3D" style="object-fit:contain;padding:12px;background:var(--bg2)"/><span class="prod-badge">Equipamento</span></div>
-        <div class="prod-body"><h3>Impressora 3D Profissional Icarus Lite</h3><p>Alta precisão para produção de peças ortopédicas e protéticas. Nível profissional.</p></div>
-        <div class="prod-footer"><a href="https://api.whatsapp.com/send?phone=5519989485354" class="prod-link" target="_blank">Solicitar ›</a><span class="prod-tag">Equipamento</span></div>
       </div>
     </div><!-- /cat-todos -->
 
@@ -798,14 +800,8 @@ footer{border-top:1px solid var(--gb);padding:clamp(40px,5vw,64px) clamp(16px,5v
       </div>
     </div>
 
-    <!-- Equipamentos -->
-    <div class="pcat-panel" id="cat-equipamentos">
-      <div class="prod-card">
-        <div class="prod-card-img"><img src="imagens/impressora%203d.png" alt="Impressora 3D" style="object-fit:contain;padding:12px;background:var(--bg2)"/><span class="prod-badge">Equipamento</span></div>
-        <div class="prod-body"><h3>Impressora 3D Profissional Icarus Lite</h3><p>Alta precisão para produção de peças ortopédicas e protéticas. Nível profissional.</p></div>
-        <div class="prod-footer"><a href="https://api.whatsapp.com/send?phone=5519989485354" class="prod-link" target="_blank">Solicitar ›</a><span class="prod-tag">Equipamento</span></div>
-      </div>
-    </div>
+    <!-- Equipamentos (vazio por enquanto) -->
+    <div class="pcat-panel" id="cat-equipamentos"></div>
 
   </div><!-- /sec-inner -->
 </section>
