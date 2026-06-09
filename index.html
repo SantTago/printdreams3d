@@ -76,31 +76,57 @@ body.cur-click #cursor-dot{transform:translate(-50%,-50%) scale(.6)}
 body.cur-click #cursor-ring{width:22px;height:22px;border-color:var(--neon2)}
 @media(hover:none){#cursor-dot,#cursor-ring{display:none}body,button,a{cursor:auto}}
 
-/* ── MOBILE TOUCH SHOCK ────────────────────────────────────── */
+/* ── MOBILE TOUCH PLASMA ─────────────────────────────────── */
 @media(hover:none){
-  .touch-spark{
-    position:fixed;width:2px;height:18px;border-radius:2px;
-    background:linear-gradient(to top,transparent 0%,var(--neon) 45%,var(--neon2) 100%);
-    pointer-events:none;z-index:9999;
-    transform-origin:50% 100%;
-    filter:drop-shadow(0 0 4px var(--neon));
-    animation:touch-zap .5s ease-out forwards;
-  }
-  .touch-ripple{
-    position:fixed;width:10px;height:10px;border-radius:50%;
-    border:2px solid var(--neon2);
-    pointer-events:none;z-index:9998;
+  .t-core{
+    position:fixed;pointer-events:none;z-index:9999;
+    width:10px;height:10px;border-radius:50%;
+    background:radial-gradient(circle,#fff 0%,var(--neon2) 50%,transparent 100%);
     transform:translate(-50%,-50%);
-    animation:touch-ring .5s ease-out forwards;
+    filter:drop-shadow(0 0 8px var(--neon2)) drop-shadow(0 0 16px var(--neon));
+    animation:t-core-pop .28s ease-out forwards;
   }
-  @keyframes touch-zap{
-    0%{transform:rotate(var(--a)) scaleY(1);opacity:1}
-    60%{transform:rotate(var(--a)) translateY(-30px) scaleY(1.1);opacity:.85}
-    100%{transform:rotate(var(--a)) translateY(-52px) scaleY(.1);opacity:0}
+  @keyframes t-core-pop{
+    0%{opacity:0;transform:translate(-50%,-50%) scale(0)}
+    25%{opacity:1;transform:translate(-50%,-50%) scale(3)}
+    100%{opacity:0;transform:translate(-50%,-50%) scale(.4)}
   }
-  @keyframes touch-ring{
-    0%{width:10px;height:10px;opacity:1;border-width:2px}
-    100%{width:70px;height:70px;opacity:0;border-width:1px;border-color:var(--neon)}
+  .t-ring{
+    position:fixed;pointer-events:none;z-index:9998;
+    width:4px;height:4px;border-radius:50%;
+    border:2px solid var(--neon2);
+    transform:translate(-50%,-50%);
+    animation:t-ring-exp var(--d,.42s) cubic-bezier(.08,.72,.25,1) var(--dl,0s) both;
+  }
+  @keyframes t-ring-exp{
+    0%{width:4px;height:4px;opacity:1;border-color:#fff;border-width:2.5px}
+    50%{opacity:.7;border-color:var(--neon2)}
+    100%{width:96px;height:96px;opacity:0;border-color:var(--neon);border-width:.5px}
+  }
+  .t-bolt{
+    position:fixed;pointer-events:none;z-index:9999;
+    width:var(--w,1.5px);height:var(--h,22px);border-radius:1px;
+    background:linear-gradient(to top,transparent 0%,var(--neon) 30%,#fff 62%,transparent 100%);
+    transform-origin:50% 100%;
+    filter:drop-shadow(0 0 2px var(--neon2));
+    animation:t-bolt-fire .52s cubic-bezier(.08,1,.25,1) forwards;
+  }
+  @keyframes t-bolt-fire{
+    0%{transform:translate(-50%,-100%) rotate(var(--a)) scaleY(1);opacity:1}
+    65%{opacity:.75}
+    100%{transform:translate(-50%,-100%) rotate(var(--a)) translateY(-62px) scaleY(.05);opacity:0}
+  }
+  .t-trail{
+    position:fixed;pointer-events:none;z-index:9997;
+    width:9px;height:9px;border-radius:50%;
+    transform:translate(-50%,-50%);
+    background:radial-gradient(circle,#fff 0%,var(--neon2) 40%,var(--neon) 70%,transparent 100%);
+    filter:blur(1px);
+    animation:t-trail-fade .36s ease-out forwards;
+  }
+  @keyframes t-trail-fade{
+    0%{opacity:.9;transform:translate(-50%,-50%) scale(1)}
+    100%{opacity:0;transform:translate(-50%,-50%) scale(.1)}
   }
 }
 
@@ -1244,35 +1270,56 @@ const rObs = new IntersectionObserver(entries => {
 }, {threshold:.08, rootMargin:'0px 0px -30px 0px'});
 document.querySelectorAll('.reveal,.reveal-l,.reveal-r').forEach(el => rObs.observe(el));
 
-// ─── Mobile Touch Shock ──────────────────────────────
+// ─── Mobile Touch Plasma ─────────────────────────────
 if(window.matchMedia('(hover:none)').matches){
-  function spawnTouchFx(x,y){
-    const ripple=document.createElement('div');
-    ripple.className='touch-ripple';
-    ripple.style.cssText=`left:${x}px;top:${y}px`;
-    document.body.appendChild(ripple);
-    setTimeout(()=>ripple.remove(),520);
-    const n=8;
+  function spawnTouchFx(x,y,trail=false){
+    if(trail){
+      const d=document.createElement('div');
+      d.className='t-trail';
+      d.style.cssText=`left:${x}px;top:${y}px`;
+      document.body.appendChild(d);
+      setTimeout(()=>d.remove(),380);
+      return;
+    }
+    // Flash central
+    const core=document.createElement('div');
+    core.className='t-core';
+    core.style.cssText=`left:${x}px;top:${y}px`;
+    document.body.appendChild(core);
+    setTimeout(()=>core.remove(),300);
+    // 3 anéis cascata
+    for(let r=0;r<3;r++){
+      const ring=document.createElement('div');
+      ring.className='t-ring';
+      ring.style.cssText=`left:${x}px;top:${y}px;--d:${.36+r*.14}s;--dl:${r*.065}s`;
+      document.body.appendChild(ring);
+      setTimeout(()=>ring.remove(),680);
+    }
+    // 12 raios com variação orgânica
+    const n=12;
     for(let i=0;i<n;i++){
-      const s=document.createElement('div');
-      s.className='touch-spark';
-      s.style.cssText=`left:${x}px;top:${y}px;--a:${(i/n)*360+Math.random()*20}deg`;
-      document.body.appendChild(s);
-      setTimeout(()=>s.remove(),520);
+      const bolt=document.createElement('div');
+      bolt.className='t-bolt';
+      const angle=(i/n)*360+(Math.random()-.5)*14;
+      const h=13+Math.random()*24;
+      const w=i%4===0?2.5:1.5;
+      bolt.style.cssText=`left:${x}px;top:${y}px;--a:${angle}deg;--h:${h}px;--w:${w}px`;
+      document.body.appendChild(bolt);
+      setTimeout(()=>bolt.remove(),560);
     }
   }
-  let lastTouchFx=0;
+  let lastFx=0;
   document.addEventListener('touchstart',e=>{
     const t=e.touches[0];
     spawnTouchFx(t.clientX,t.clientY);
-    lastTouchFx=Date.now();
+    lastFx=Date.now();
   },{passive:true});
   document.addEventListener('touchmove',e=>{
     const now=Date.now();
-    if(now-lastTouchFx>120){
+    if(now-lastFx>95){
       const t=e.touches[0];
-      spawnTouchFx(t.clientX,t.clientY);
-      lastTouchFx=now;
+      spawnTouchFx(t.clientX,t.clientY,true);
+      lastFx=now;
     }
   },{passive:true});
 }
