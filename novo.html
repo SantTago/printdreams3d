@@ -114,9 +114,13 @@ body.cur-click #cursor-ring{width:22px;height:22px;border-color:var(--neon2)}
 }
 #hdr.scrolled{border-color:rgba(14,165,233,.22)}
 .nav-w{display:flex;align-items:center;height:70px;padding:0 clamp(16px,3vw,48px);gap:20px}
-.logo{display:flex;align-items:center;gap:10px;flex-shrink:0}
-.logo img{height:34px}
-.logo-text{font-family:var(--bebas);font-size:1.4rem;letter-spacing:.06em;background:linear-gradient(90deg,var(--neon),var(--neon2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.logo{display:flex;align-items:center;gap:0;flex-shrink:0;position:relative}
+.logo-icon{height:44px;width:auto;display:block;position:relative;z-index:2;filter:drop-shadow(0 0 8px rgba(14,165,233,.35))}
+.logo-main{height:28px;width:auto;display:block;position:relative;z-index:1}
+.logo-dark{display:block}
+.logo-light{display:none}
+[data-theme="light"] .logo-dark{display:none}
+[data-theme="light"] .logo-light{display:block}
 
 .nav-menu{display:flex;align-items:center;gap:2px;margin-left:24px}
 .nav-menu a,.nav-drop>span{
@@ -141,16 +145,22 @@ body.cur-click #cursor-ring{width:22px;height:22px;border-color:var(--neon2)}
 
 .nav-right{display:flex;align-items:center;gap:10px;margin-left:auto}
 .theme-btn{
-  width:42px;height:24px;border-radius:12px;
-  background:var(--glass);border:1px solid rgba(14,165,233,.28);
-  position:relative;flex-shrink:0;transition:background .3s;
+  width:40px;height:22px;border-radius:11px;
+  background:rgba(60,60,67,.6);border:none;
+  position:relative;flex-shrink:0;
+  transition:background .3s var(--ease),box-shadow .3s;
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.45);
 }
+[data-theme="light"] .theme-btn{background:#0EA5E9;box-shadow:0 0 10px rgba(14,165,233,.4)}
 .theme-btn::after{
-  content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;
-  background:var(--neon);transition:transform .3s var(--ease);
+  content:'';position:absolute;top:3px;left:3px;
+  width:16px;height:16px;border-radius:50%;
+  background:#fff;
+  box-shadow:0 1px 4px rgba(0,0,0,.35);
+  transition:transform .3s var(--ease);
 }
 [data-theme="light"] .theme-btn::after{transform:translateX(18px)}
-.t-icon{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-around;padding:0 5px;font-size:.55rem;pointer-events:none}
+.t-icon{display:none}
 .nav-cta{
   padding:8px 18px;border-radius:8px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
   background:var(--neon);color:#000;transition:box-shadow .25s,transform .25s;
@@ -164,7 +174,44 @@ body.cur-click #cursor-ring{width:22px;height:22px;border-color:var(--neon2)}
   .nav-menu a,.nav-drop>span{font-size:13px}
   .drop{position:static;opacity:1;visibility:visible;transform:none;pointer-events:auto;background:transparent;border:none;box-shadow:none;padding:0 0 4px 14px}
   .burger{display:flex}
+  .nav-cta{display:none}
 }
+
+/* ── CURSOR CHARGE + SPARKS ───────────────────────────────── */
+body.cur-charge #cursor-ring{
+  width:56px;height:56px;
+  border:2px solid var(--neon);
+  box-shadow:0 0 16px var(--neon),0 0 32px rgba(14,165,233,.35);
+  animation:ring-pulse .35s ease-in-out infinite;
+}
+body.cur-charge #cursor-dot{
+  transform:translate(-50%,-50%) scale(2);
+  background:var(--neon2);
+  box-shadow:0 0 18px var(--neon2),0 0 36px rgba(0,212,255,.5);
+}
+@keyframes ring-pulse{
+  0%,100%{box-shadow:0 0 12px var(--neon),0 0 24px rgba(14,165,233,.3)}
+  50%{box-shadow:0 0 24px var(--neon),0 0 50px rgba(14,165,233,.55)}
+}
+.cursor-spark{
+  position:fixed;width:3px;height:12px;border-radius:2px;
+  background:linear-gradient(to bottom,var(--neon2),transparent);
+  pointer-events:none;z-index:9998;
+  transform-origin:center bottom;
+  animation:spark-out .55s ease-out forwards;
+}
+@keyframes spark-out{
+  0%{transform:translate(-50%,-100%) rotate(var(--a)) scaleY(1);opacity:1}
+  100%{transform:translate(-50%,-100%) rotate(var(--a)) translateY(-50px) scaleY(.2);opacity:0}
+}
+
+/* ── PRODUCT CARDS 3D ──────────────────────────────────────── */
+.prod-card-glare{
+  position:absolute;inset:0;border-radius:16px;
+  pointer-events:none;z-index:5;opacity:0;
+  transition:opacity .25s;
+}
+.prod-card:hover .prod-card-glare{opacity:1}
 
 /* ── HERO BANNER ───────────────────────────────────────────── */
 .hero{
@@ -369,10 +416,11 @@ body.cur-click #cursor-ring{width:22px;height:22px;border-color:var(--neon2)}
 .pcat-panel{grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px}
 .prod-card{
   background:var(--card);border:1px solid var(--cb);border-radius:16px;overflow:hidden;
-  transition:transform .3s var(--ease),border-color .3s,box-shadow .3s;
+  transition:border-color .3s,box-shadow .5s var(--ease);
   display:flex;flex-direction:column;position:relative;
+  will-change:transform;
 }
-.prod-card:hover{transform:translateY(-6px);border-color:rgba(14,165,233,.3);box-shadow:0 16px 50px rgba(14,165,233,.08)}
+.prod-card:hover{border-color:rgba(14,165,233,.38);box-shadow:0 22px 60px rgba(14,165,233,.18),0 0 0 1px rgba(14,165,233,.12)}
 .prod-card-img{
   aspect-ratio:16/9;background:var(--bg2);overflow:hidden;position:relative;
   display:flex;align-items:center;justify-content:center;
@@ -533,8 +581,8 @@ footer{border-top:1px solid var(--gb);padding:clamp(40px,5vw,64px) clamp(16px,5v
 <header id="hdr">
   <div class="nav-w">
     <a href="printdreams3d.html" class="logo">
-      <img src="https://static.wixstatic.com/media/b9c99c_bc2ee588659a448d87d594ba874b4fdd~mv2.png" alt="PrintDreams 3D"/>
-      <span class="logo-text">PrintDreams 3D</span>
+      <img src="LOGO%20MODO%20PRETO%20.png" alt="PrintDreams 3D" class="logo-main logo-dark"/>
+      <img src="LOGO%20MODO%20BRANCO.png" alt="PrintDreams 3D" class="logo-main logo-light"/>
     </a>
 
     <nav class="nav-menu" id="navMenu">
@@ -573,9 +621,7 @@ footer{border-top:1px solid var(--gb);padding:clamp(40px,5vw,64px) clamp(16px,5v
     </nav>
 
     <div class="nav-right">
-      <button class="theme-btn" id="themeBtn" aria-label="Alternar tema">
-        <span class="t-icon"><span>☀️</span><span>🌙</span></span>
-      </button>
+      <button class="theme-btn" id="themeBtn" aria-label="Alternar tema"></button>
       <a href="https://api.whatsapp.com/send?phone=5519989485354&text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20os%20produtos%20da%20PrintDreams%203D." target="_blank" rel="noopener" class="nav-cta">WhatsApp</a>
       <button class="burger" id="burger" aria-label="Menu"><span></span><span></span><span></span></button>
     </div>
@@ -1007,7 +1053,7 @@ footer{border-top:1px solid var(--gb);padding:clamp(40px,5vw,64px) clamp(16px,5v
     </div>
   </div>
   <div class="foot-bottom">
-    <span>© 2024 PrintDreams 3D — Todos os direitos reservados.</span>
+    <span>© <span id="footer-year">2024</span> PrintDreams 3D — Todos os direitos reservados.</span>
     <div class="foot-social">
       <a href="https://www.instagram.com/printdreams3d/" target="_blank" title="Instagram">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
@@ -1041,8 +1087,58 @@ document.querySelectorAll('a,button,.pcat-btn,.slide-arrow,.dot,.prod-card').for
   el.addEventListener('mouseenter',()=>document.body.classList.add('cur-hover'));
   el.addEventListener('mouseleave',()=>document.body.classList.remove('cur-hover'));
 });
-document.addEventListener('mousedown',()=>document.body.classList.add('cur-click'));
-document.addEventListener('mouseup',()=>document.body.classList.remove('cur-click'));
+let chargeLevel=0,chargeTimer=null;
+function fireSparks(x,y,lvl){
+  const n=Math.min(6+lvl*2,18);
+  for(let i=0;i<n;i++){
+    const s=document.createElement('div');
+    s.className='cursor-spark';
+    s.style.cssText=`left:${x}px;top:${y}px;--a:${(i/n)*360}deg;height:${8+lvl*2}px`;
+    document.body.appendChild(s);
+    setTimeout(()=>s.remove(),600);
+  }
+}
+document.addEventListener('mousedown',()=>{
+  document.body.classList.add('cur-click');
+  chargeLevel=0;
+  chargeTimer=setInterval(()=>{
+    chargeLevel=Math.min(chargeLevel+1,8);
+    if(chargeLevel>=2)document.body.classList.add('cur-charge');
+  },90);
+});
+document.addEventListener('mouseup',e=>{
+  clearInterval(chargeTimer);
+  document.body.classList.remove('cur-click');
+  document.body.classList.remove('cur-charge');
+  if(chargeLevel>=2)fireSparks(e.clientX,e.clientY,chargeLevel);
+  chargeLevel=0;
+});
+
+// ─── 3D Product Cards ────────────────────────────────────
+document.querySelectorAll('.prod-card').forEach(card=>{
+  const glare=document.createElement('div');
+  glare.className='prod-card-glare';
+  card.appendChild(glare);
+  card.addEventListener('mousemove',e=>{
+    const r=card.getBoundingClientRect();
+    const x=(e.clientX-r.left)/r.width-.5;
+    const y=(e.clientY-r.top)/r.height-.5;
+    card.style.transform=`perspective(800px) rotateX(${y*-14}deg) rotateY(${x*20}deg) translateZ(10px)`;
+    card.style.transition='transform .12s ease,border-color .3s,box-shadow .5s';
+    const gx=(e.clientX-r.left)/r.width*100;
+    const gy=(e.clientY-r.top)/r.height*100;
+    glare.style.background=`radial-gradient(circle at ${gx}% ${gy}%,rgba(255,255,255,.13) 0%,transparent 65%)`;
+  });
+  card.addEventListener('mouseleave',()=>{
+    card.style.transform='perspective(800px) rotateX(0deg) rotateY(0deg) translateZ(0)';
+    card.style.transition='transform .5s var(--ease),border-color .3s,box-shadow .5s';
+    glare.style.background='none';
+  });
+});
+
+// ─── Footer year ─────────────────────────────────
+const fy=document.getElementById('footer-year');
+if(fy)fy.textContent=new Date().getFullYear();
 
 // ─── Theme ───────────────────────────────────────
 const html = document.documentElement;
